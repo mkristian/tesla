@@ -7,6 +7,7 @@ import com.google.inject.Key;
 import com.google.inject.OutOfScopeException;
 import com.google.inject.Provider;
 import com.google.inject.Scope;
+import com.google.inject.util.Providers;
 
 public class MojoExecutionScope
     implements Scope
@@ -46,14 +47,7 @@ public class MojoExecutionScope
 
     public <T> void seed( Class<?> clazz, final T value )
     {
-        Provider<T> provider = new Provider<T>()
-        {
-            public T get()
-            {
-                return value;
-            }
-        };
-        values.get().put( Key.get( clazz ), provider );
+        values.get().put( Key.get( clazz ), Providers.of( value ) );
     }
 
     public <T> Provider<T> scope( final Key<T> key, final Provider<T> unscoped )
