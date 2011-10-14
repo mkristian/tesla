@@ -27,15 +27,13 @@ import org.eclipse.tesla.incremental.Digester;
  * <ul>
  * <li>Maven plugin artifacts GAVs, file sizes and timestamps</li>
  * <li>Project effective pom.xml. In the future, this may be narrowed down.</li>
- * <li>Maven session user properties.</li>
+ * <li>Maven session execution, i.e. user and system, properties.</li>
  * </ul>
  * </li>
  * </ul>
  * 
  * @TODO decide how to handle volatile properties like ${maven.build.timestamp}. Should we always ignore them? Are there
  *       cases where output has to be always regenerated just to include new build timestamp?
- * @TODO decide if settings (or effective settings) can contribute anything not already covered by project and session
- * @TODO decide if session system properties should be tracked as configuration too
  */
 @Component( role = MavenBuildContextManager.class )
 public class MavenBuildContextManager
@@ -79,8 +77,8 @@ public class MavenBuildContextManager
 
         // TODO decide if we care about system properties
 
-        // user properties define build parameters passed in from command line
-        for ( Map.Entry<Object, Object> property : session.getUserProperties().entrySet() )
+        // execution properties define build parameters passed in from command line and jvm used
+        for ( Map.Entry<Object, Object> property : session.getExecutionProperties().entrySet() )
         {
             digester.strings( property.getKey().toString(), property.getValue().toString() );
         }
