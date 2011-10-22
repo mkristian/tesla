@@ -21,8 +21,8 @@ import java.util.List;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.incremental.internal.MavenBuildContextManager;
-import org.apache.maven.incremental.internal.MojoExecutionScope;
 import org.apache.maven.incremental.internal.MojoExecutionModule;
+import org.apache.maven.incremental.internal.MojoExecutionScope;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -30,8 +30,8 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.component.repository.ComponentDependency;
 import org.eclipse.tesla.incremental.BuildContext;
+import org.eclipse.tesla.incremental.BuildException;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.repository.RemoteRepository;
 
@@ -54,7 +54,7 @@ public class DefaultBuildPluginManager
     @Requirement
     private MavenBuildContextManager buildContextManager;
 
-    @Requirement(hint=MojoExecutionModule.SCOPE_NAME)
+    @Requirement( hint = MojoExecutionModule.SCOPE_NAME )
     private MojoExecutionScope scope;
 
     /**
@@ -128,6 +128,20 @@ public class DefaultBuildPluginManager
             try
             {
                 mojo.execute();
+
+                // persist build context back to disk and delete any stale output files, throw exception in case of
+                // errors
+                if ( buildContext[0] != null )
+                {
+                    try
+                    {
+                        buildContext[0].commit();
+                    }
+                    catch ( BuildException e )
+                    {
+                        throw new MojoExecutionException( e.getMessage(), e );
+                    }
+                }
             }
             catch ( ClassCastException e )
             {
@@ -181,31 +195,18 @@ public class DefaultBuildPluginManager
         {
             mavenPluginManager.releaseMojo( mojo, mojoExecution );
 
-            scope.exit();
             if ( buildContext[0] != null )
             {
                 buildContext[0].close();
             }
+
+            scope.exit();
 
             Thread.currentThread().setContextClassLoader( oldClassLoader );
 
             legacySupport.setSession( oldSession );
         }
 
-
-    }
-
-    private boolean isUsingBuildAvoidance( PluginDescriptor pluginDescriptor )
-    {
-        for ( ComponentDependency dependency : pluginDescriptor.getDependencies() )
-        {
-            if ( "org.eclipse.tesla".equals( dependency.getGroupId() )
-                && "tesla-build-avoidance".equals( dependency.getArtifactId() ) )
-            {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
