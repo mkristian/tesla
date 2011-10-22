@@ -4,6 +4,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
@@ -12,6 +14,7 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.Logger;
 import org.eclipse.tesla.incremental.BuildContext;
 import org.eclipse.tesla.incremental.BuildContextManager;
 import org.eclipse.tesla.incremental.Digester;
@@ -40,6 +43,9 @@ public class MavenBuildContextManager
 {
     @Requirement
     private BuildContextManager manager;
+
+    @Requirement
+    private Logger logger;
 
     public BuildContext newContext( MavenSession session, MojoExecution execution )
     {
@@ -75,15 +81,26 @@ public class MavenBuildContextManager
         }
         digester.bytes( buf.toByteArray() );
 
-        // TODO decide if we care about system properties
-
         // execution properties define build parameters passed in from command line and jvm used
-        for ( Map.Entry<Object, Object> property : session.getExecutionProperties().entrySet() )
+        SortedMap<Object, Object> executionProperties = new TreeMap<Object, Object>( session.getExecutionProperties() );
+        for ( Map.Entry<Object, Object> property : executionProperties.entrySet() )
         {
-            digester.strings( property.getKey().toString(), property.getValue().toString() );
+            String key = property.getKey().toString();
+
+            // Environment has PID of java process (env.JAVA_MAIN_CLASS_<PID>), SSH_AGENT_PID, unique TMPDIR (on OSX)
+            // and other volatile variables.
+            if ( !key.startsWith( "env." ) )
+            {
+                digester.strings( key, property.getValue().toString() );
+            }
         }
 
-        context.setConfiguration( digester.finish() );
+        boolean full = context.setConfiguration( digester.finish() );
+
+        if ( logger.isDebugEnabled() )
+        {
+            logger.debug( "New " + ( full ? "full" : "incremental" ) + " BuildContext for " + execution.toString() );
+        }
 
         return context;
     }
