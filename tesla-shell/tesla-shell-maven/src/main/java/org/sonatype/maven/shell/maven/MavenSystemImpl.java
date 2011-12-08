@@ -559,6 +559,9 @@ public class MavenSystemImpl implements MavenSystem {
       log.debug("Removing all realms from: {}", world);
 
       // noinspection unchecked
+      purgeStrayShutdownHooks(world.getRealms());
+
+      // noinspection unchecked
       for (ClassRealm realm : (List<ClassRealm>) world.getRealms()) {
         String id = realm.getId();
         try {
@@ -568,9 +571,6 @@ public class MavenSystemImpl implements MavenSystem {
           log.warn("Failed to dispose class realm: {}", id, e);
         }
       }
-
-      // noinspection unchecked
-      purgeStrayShutdownHooks(world.getRealms());
 
       container.dispose();
     }
