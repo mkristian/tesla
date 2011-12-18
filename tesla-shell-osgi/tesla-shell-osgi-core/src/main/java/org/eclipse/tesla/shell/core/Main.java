@@ -114,6 +114,14 @@ public class Main
             final FrameworkEvent event = framework.waitForStop( 0 );
             if ( event.getType() != FrameworkEvent.STOPPED_UPDATE )
             {
+                final String provisionError = System.getProperty( "provision-error" );
+                if ( provisionError != null )
+                {
+                    System.out.println(
+                        "Problem found during provisioning (" + provisionError + "). See log for details."
+                    );
+                    removeChecksum( shellProperties );
+                }
                 break;
             }
         }
@@ -129,6 +137,13 @@ public class Main
         properties.putAll( bundleProperties );
 
         fileWrite( checksumFile, SHA1( properties ) );
+    }
+
+    private void removeChecksum( final Properties shellProperties )
+        throws Exception
+    {
+        final File checksumFile = new File( new File( shellProperties.getProperty( PROFILE ) ), "checksum" );
+        checksumFile.delete();
     }
 
     private boolean shouldForceReset( final Properties shellProperties, final Properties bundleProperties )
