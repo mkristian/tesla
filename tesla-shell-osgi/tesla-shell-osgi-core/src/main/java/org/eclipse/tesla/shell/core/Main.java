@@ -117,9 +117,8 @@ public class Main
                 final String provisionError = System.getProperty( "provision-error" );
                 if ( provisionError != null )
                 {
-                    System.out.println(
-                        "Problem found during provisioning (" + provisionError + "). See log for details."
-                    );
+                    System.out.println( "Problem found during provisioning. See log for details." );
+                    System.out.println( provisionError );
                     removeChecksum( shellProperties );
                 }
                 break;
