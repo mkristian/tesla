@@ -104,9 +104,9 @@ class DefaultProvisioner
                             }
                             catch ( Exception e )
                             {
-                                System.out.println( "Problem found during provisioning. See log for details." );
                                 if ( Boolean.valueOf( (String) serviceReference.getProperty( "exit-on-error" ) ) )
                                 {
+                                    System.setProperty( "provision-error", e.getMessage() );
                                     try
                                     {
                                         bundleContext.getBundle( 0 ).stop();
