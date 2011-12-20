@@ -185,7 +185,7 @@
     <module>maven-embedder</module>
     <module>maven-compat</module>
     <module>tesla-shell</module>
-    <module>tesla-shell-osgi</module>
+    <module>tesla-shell-osgi</module>    
     <module>tesla-polyglot</module> 
   </modules>
 
