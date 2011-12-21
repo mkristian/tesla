@@ -306,6 +306,8 @@ This goal just validates the presence of that distribution.
         <include name="mvnyjp" />
         <include name="tsh" />
         <include name="tshd" />
+        <include name="tsh-osgi" />
+        <include name="tshd-osgi" />
         <include name="pmvn" />
         <include name="translate" />
       </fileset>
