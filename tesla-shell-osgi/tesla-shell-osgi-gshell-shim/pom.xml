@@ -80,6 +80,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-library</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.eclipse.tesla.shell.commands</groupId>
       <artifactId>tesla-shell-file</artifactId>
       <version>${project.version}</version>
