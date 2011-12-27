@@ -10,6 +10,7 @@ package org.eclipse.tesla.shell.preparator;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.Collection;
 
 /**
  * A {@link Method} {@link ActionInjector}.
@@ -62,7 +63,30 @@ public class ActionMethodInjector
         method.setAccessible( true );
         try
         {
-            method.invoke( instance, value );
+            if ( value != null
+                && value instanceof Collection
+                && !( method.getParameterTypes()[0].isArray()
+                || Collection.class.isAssignableFrom( method.getParameterTypes()[0] ) ) )
+            {
+                for ( final Object item : (Collection) value )
+                {
+                    method.invoke( instance, item );
+                }
+            }
+            else if ( value != null
+                && value.getClass().isArray()
+                && !( method.getParameterTypes()[0].isArray()
+                || Collection.class.isAssignableFrom( method.getParameterTypes()[0] ) ) )
+            {
+                for ( final Object item : (Object[]) value )
+                {
+                    method.invoke( instance, item );
+                }
+            }
+            else
+            {
+                method.invoke( instance, value );
+            }
         }
         catch ( InvocationTargetException e )
         {

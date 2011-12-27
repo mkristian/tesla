@@ -413,16 +413,49 @@ public abstract class AbstractActionPreparator
                               final boolean multiValue )
         throws Exception
     {
-        if ( toType == String.class )
+        if ( value == null )
         {
-            return value != null ? value.toString() : null;
+            return null;
+        }
+        if ( toType == String.class && !multiValue )
+        {
+            return value.toString();
         }
         Object toConvert = value;
         if ( multiValue && !( toConvert.getClass().isArray() || toConvert instanceof Collection ) )
         {
             toConvert = new Object[]{ toConvert };
         }
-        return new DefaultConverter( action.getClass().getClassLoader() ).convert( toConvert, toType );
+        final DefaultConverter converter = new DefaultConverter( action.getClass().getClassLoader() );
+        try
+        {
+            return converter.convert( toConvert, toType );
+        }
+        catch ( Exception e )
+        {
+            if ( !multiValue )
+            {
+                throw e;
+            }
+            final List<Object> converted = new ArrayList<Object>();
+            if ( toConvert.getClass().isArray() )
+            {
+                for ( final Object item : (Object[]) toConvert )
+                {
+                    converted.add( convert( action, item, toType, false ) );
+                }
+                return converted;
+            }
+            else if ( toConvert instanceof Collection )
+            {
+                for ( final Object item : (Collection) toConvert )
+                {
+                    converted.add( convert( action, item, toType, false ) );
+                }
+                return converted;
+            }
+            throw e;
+        }
     }
 
 }

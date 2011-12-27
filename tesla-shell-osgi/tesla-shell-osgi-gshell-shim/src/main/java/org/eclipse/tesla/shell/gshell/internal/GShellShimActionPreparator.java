@@ -84,6 +84,8 @@ public class GShellShimActionPreparator
                 {
                     options.add(
                         optionDescriptor( option, resourceBundle, field.getName() )
+                            .setMultiValued( field.getType().isArray()
+                                                 || Collection.class.isAssignableFrom( field.getType() ) )
                             .setInjector( new ActionFieldInjector( commandAction, field ) )
                     );
                 }
@@ -96,6 +98,7 @@ public class GShellShimActionPreparator
                 {
                     options.add(
                         optionDescriptor( option, resourceBundle, method.getName() )
+                            .setMultiValued( true )
                             .setInjector( new ActionMethodInjector( commandAction, method ) )
                     );
                 }
@@ -158,8 +161,7 @@ public class GShellShimActionPreparator
         return argumentDescriptor( argument )
             .setName( method.getName() )
             .loadDescription( resourceBundle, method.getName() )
-            .setMultiValued( method.getParameterTypes()[0].isArray()
-                                 || Collection.class.isAssignableFrom( method.getParameterTypes()[0] ) );
+            .setMultiValued( true );
     }
 
     private ArgumentDescriptor argumentDescriptor( final Argument argument )
