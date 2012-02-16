@@ -16,12 +16,13 @@
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>3.0.4-SNAPSHOT</version>
+    <version>3.0.5-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-core</artifactId>
 
   <name>Maven Core</name>
+  <description>Maven Core classes.</description>
 
   <dependencies>
     <!--  Maven -->
@@ -60,17 +61,14 @@
     <dependency>
       <groupId>org.sonatype.aether</groupId>
       <artifactId>aether-impl</artifactId>
-      <version>${aetherVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.sonatype.aether</groupId>
       <artifactId>aether-api</artifactId>
-      <version>${aetherVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.sonatype.aether</groupId>
       <artifactId>aether-util</artifactId>
-      <version>${aetherVersion}</version>
     </dependency>
     <!-- Plexus -->
     <dependency>
@@ -142,7 +140,6 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>buildnumber-maven-plugin</artifactId>
-            <version>1.0-beta-4</version>
             <executions>
               <execution>
                 <phase>generate-resources</phase>
@@ -174,7 +171,6 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>buildnumber-maven-plugin</artifactId>
-            <version>1.0-beta-1</version>
             <executions>
               <execution>
                 <phase>generate-resources</phase>

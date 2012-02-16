@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
   <!--
-    Licensed to the Apache Software Foundation (ASF) under one or more contributor license agreements. See the NOTICE
-    file distributed with this work for additional information regarding copyright ownership. The ASF licenses this file
-    to you under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
-    the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by
-    applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language
-    governing permissions and limitations under the License.
+    Licensed to the Apache Software Foundation (ASF) under one or more
+    contributor license agreements. See the NOTICE file distributed with
+    this work for additional information regarding copyright ownership.
+    The ASF licenses this file to you under the Apache License, Version
+    2.0 (the "License"); you may not use this file except in compliance
+    with the License. You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0 Unless required by
+    applicable law or agreed to in writing, software distributed under
+    the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+    OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and
+    limitations under the License.
   -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -16,12 +21,12 @@
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>15</version>
+    <version>21</version>
     <relativePath>../pom/maven/pom.xml</relativePath>
   </parent>
 
   <artifactId>maven</artifactId>
-  <version>3.0.4-SNAPSHOT</version>
+  <version>3.0.5-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Apache Maven</name>
@@ -33,7 +38,7 @@
     number of other development tools for reporting or the build
     process.
   </description>
-  <url>http://maven.apache.org/</url>
+  <url>${siteUrl}</url>
   <inceptionYear>2001</inceptionYear>
 
   <properties>
@@ -44,15 +49,23 @@
     <plexusVersion>1.5.5</plexusVersion>
     <plexusInterpolationVersion>1.14</plexusInterpolationVersion>
     <plexusUtilsVersion>2.0.6</plexusUtilsVersion>
-    <sisuInjectVersion>2.2.1</sisuInjectVersion>
-    <wagonVersion>1.0-beta-7</wagonVersion>
+    <sisuInjectVersion>2.3.0</sisuInjectVersion>
+    <wagonVersion>2.2</wagonVersion>
     <securityDispatcherVersion>1.3</securityDispatcherVersion>
-    <cipherVersion>1.4</cipherVersion>
+    <cipherVersion>1.7</cipherVersion>
     <modelloVersion>1.4.1</modelloVersion>
     <jxpathVersion>1.3</jxpathVersion>
-    <aetherVersion>1.11</aetherVersion>
     <slf4jVersion>1.6.1</slf4jVersion>
+    <aetherVersion>1.13.1</aetherVersion>
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
+    <!-- Control the name of the distribution and information output by mvn -->
+    <distributionId>apache-maven</distributionId>
+    <distributionShortName>Maven</distributionShortName>
+    <distributionName>Apache Maven</distributionName>
+
+    <siteDeployUrl>scp://people.apache.org/www/maven.apache.org/ref/${project.version}/</siteDeployUrl>
+    <siteUrl>http://maven.apache.org/ref/${project.version}/</siteUrl>
+
   </properties>
 
   <mailingLists>
@@ -132,18 +145,18 @@
   </mailingLists>
 
   <modules>
-    <module>maven-core</module>
-    <module>apache-maven</module>
+    <module>maven-plugin-api</module>
     <module>maven-model</module>
+    <module>maven-model-builder</module>
+    <module>maven-core</module>
     <module>maven-settings</module>
     <module>maven-settings-builder</module>
     <module>maven-artifact</module>
     <module>maven-aether-provider</module>
     <module>maven-repository-metadata</module>
-    <module>maven-plugin-api</module>
-    <module>maven-model-builder</module>
     <module>maven-embedder</module>
     <module>maven-compat</module>
+    <module>apache-maven</module>
   </modules>
 
   <scm>
@@ -155,10 +168,14 @@
     <system>jira</system>
     <url>http://jira.codehaus.org/browse/MNG</url>
   </issueManagement>
+  <ciManagement>
+    <system>Jenkins</system>
+    <url>https://builds.apache.org/job/maven-3.0.x/</url>
+  </ciManagement>
   <distributionManagement>
     <site>
       <id>apache.website</id>
-      <url>scp://people.apache.org/www/maven.apache.org/ref/${project.version}/</url>
+      <url>${siteDeployUrl}</url>
     </site>
   </distributionManagement>
 
@@ -287,8 +304,9 @@
       </dependency>
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-http-lightweight</artifactId>
+        <artifactId>wagon-http</artifactId>
         <version>${wagonVersion}</version>
+        <classifier>shaded</classifier>
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
@@ -400,14 +418,6 @@
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>2.0.2</version>
-          <configuration>
-            <source>1.5</source>
-            <target>1.5</target>
-          </configuration>
-        </plugin>
-        <plugin>
           <artifactId>maven-release-plugin</artifactId>
           <configuration>
             <tagBase>https://svn.apache.org/repos/asf/maven/maven-3/tags</tagBase>
@@ -415,8 +425,8 @@
           </configuration>
         </plugin>
         <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.7.2</version>
           <configuration>
             <argLine>-Xmx256m</argLine>
           </configuration>
@@ -425,9 +435,6 @@
           <groupId>org.codehaus.modello</groupId>
           <artifactId>modello-maven-plugin</artifactId>
           <version>${modelloVersion}</version>
-          <configuration>
-            <useJava5>true</useJava5>
-          </configuration>
           <executions>
             <execution>
               <id>site-docs</id>
@@ -458,24 +465,9 @@
           <version>2.2-beta-5</version>
         </plugin>
         <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <version>2.5</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-resources-plugin</artifactId>
-          <version>2.4.2</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-remote-resources-plugin</artifactId>
-          <version>1.1</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-site-plugin</artifactId>
-          <version>2.1</version>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>buildnumber-maven-plugin</artifactId>
+          <version>1.0</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -529,22 +521,58 @@
       <reporting>
         <plugins>
           <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>2.5</version>
+            <configuration>
+              <linksource>true</linksource>
+              <links combine.children="append">
+                <link>http://sonatype.github.com/sonatype-aether/apidocs/</link>
+              </links>
+            </configuration>
+            <reportSets>
+              <reportSet>
+                <id>non-aggregate</id>
+                <reports>
+                  <report>javadoc</report>
+                  <report>test-javadoc</report>
+                </reports>
+              </reportSet>
+              <reportSet>
+                <id>aggregate</id>
+                <inherited>false</inherited>
+                <reports>
+                  <report>aggregate</report>
+                </reports>
+              </reportSet>
+            </reportSets>
           </plugin>
           <plugin>
-            <artifactId>maven-pmd-plugin</artifactId>
-            <configuration>
-              <targetJdk>1.5</targetJdk>
-            </configuration>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jxr-plugin</artifactId>
+            <version>2.3</version>
+            <reportSets>
+              <reportSet>
+                <id>non-aggregate</id>
+                <reports>
+                  <report>jxr</report>
+                  <report>test-jxr</report>
+                </reports>
+              </reportSet>
+              <reportSet>
+                <id>aggregate</id>
+                <inherited>false</inherited>
+                <reports>
+                  <report>aggregate</report>
+                </reports>
+              </reportSet>
+            </reportSets>
           </plugin>
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>cobertura-maven-plugin</artifactId>
-            <version>2.2</version>
             <reportSets>
               <reportSet>
-                <!-- Disabled at it kills the site generation via a NoClassDefFoundError -->
+                <!-- Disabled as it kills the site generation via a NoClassDefFoundError -->
                 <reports />
               </reportSet>
             </reportSets>
@@ -562,6 +590,7 @@
       <build>
         <plugins>
           <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <systemProperties combine.children="append">
@@ -576,37 +605,6 @@
         </plugins>
       </build>
     </profile>
-    <profile>
-      <id>m2e</id>
-      <properties>
-        <m2BuildDirectory>target</m2BuildDirectory>
-      </properties>
-      <activation>
-        <property>
-          <name>m2e.version</name>
-        </property>
-      </activation>
-      <build>
-        <directory>${m2BuildDirectory}</directory>
-        <plugins>
-          <plugin>
-            <groupId>org.maven.ide.eclipse</groupId>
-            <artifactId>lifecycle-mapping</artifactId>
-            <version>0.10.0</version>
-            <configuration>
-              <mappingId>customizable</mappingId>
-              <configurators>
-                <configurator id="org.maven.ide.eclipse.jdt.javaConfigurator" />
-                <configurator id="org.maven.ide.eclipse.modello.modelloConfigurator" />
-                <configurator id="org.maven.ide.eclipse.plexus.annotations.plexusConfigurator" />
-              </configurators>
-              <mojoExecutions>
-                <mojoExecution>org.apache.maven.plugins:maven-resources-plugin::</mojoExecution>
-              </mojoExecutions>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
   </profiles>
+
 </project>

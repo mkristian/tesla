@@ -35,6 +35,7 @@
           <name>finalName</name>
           <alias>jarName</alias>
           <type>java.lang.String</type>
+          <implementation>java.lang.String</implementation> 
           <required>false</required>
           <editable>true</editable>
           <description>parameter-description</description>

@@ -25,13 +25,13 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>3.0.4-SNAPSHOT</version>
+    <version>3.0.5-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-repository-metadata</artifactId>
 
   <name>Maven Repository Metadata Model</name>
-  <description>Per-directory repository metadata.</description>
+  <description>Per-directory local and remote repository metadata.</description>
 
   <dependencies>
     <dependency>

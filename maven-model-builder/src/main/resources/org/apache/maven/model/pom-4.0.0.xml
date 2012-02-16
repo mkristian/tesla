@@ -26,8 +26,8 @@ under the License.
   <repositories>
     <repository>
       <id>central</id>
-      <name>Maven Repository Switchboard</name>
-      <url>http://repo1.maven.org/maven2</url>
+      <name>Central Repository</name>
+      <url>http://repo.maven.apache.org/maven2</url>
       <layout>default</layout>
       <snapshots>
         <enabled>false</enabled>
@@ -38,8 +38,8 @@ under the License.
   <pluginRepositories>
     <pluginRepository>
       <id>central</id>
-      <name>Maven Plugin Repository</name>
-      <url>http://repo1.maven.org/maven2</url>
+      <name>Central Repository</name>
+      <url>http://repo.maven.apache.org/maven2</url>
       <layout>default</layout>
       <snapshots>
         <enabled>false</enabled>

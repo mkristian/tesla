@@ -33,9 +33,11 @@ import org.apache.maven.model.InputSource;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.aether.RepositorySystem;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.RequestTrace;
+import org.sonatype.aether.artifact.ArtifactType;
 import org.sonatype.aether.artifact.ArtifactTypeRegistry;
 import org.sonatype.aether.collection.CollectRequest;
 import org.sonatype.aether.collection.DependencyCollectionException;
@@ -84,6 +86,12 @@ public class DefaultProjectDependenciesResolver
         {
             for ( Dependency dependency : project.getDependencies() )
             {
+                if ( StringUtils.isEmpty( dependency.getGroupId() ) || StringUtils.isEmpty( dependency.getArtifactId() )
+                    || StringUtils.isEmpty( dependency.getVersion() ) )
+                {
+                    // guard against case where best-effort resolution for invalid models is requested
+                    continue;
+                }
                 collect.addDependency( RepositoryUtils.toDependency( dependency, stereotypes ) );
             }
         }
@@ -92,7 +100,18 @@ public class DefaultProjectDependenciesResolver
             Map<String, Dependency> dependencies = new HashMap<String, Dependency>();
             for ( Dependency dependency : project.getDependencies() )
             {
-                String key = dependency.getManagementKey();
+                String classifier = dependency.getClassifier();
+                if ( classifier == null )
+                {
+                    ArtifactType type = stereotypes.get( dependency.getType() );
+                    if ( type != null )
+                    {
+                        classifier = type.getClassifier();
+                    }
+                }
+                String key =
+                    ArtifacIdUtils.toVersionlessId( dependency.getGroupId(), dependency.getArtifactId(),
+                                                    dependency.getType(), classifier );
                 dependencies.put( key, dependency );
             }
             for ( Artifact artifact : project.getDependencyArtifacts() )

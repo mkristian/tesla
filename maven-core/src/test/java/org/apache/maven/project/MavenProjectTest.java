@@ -46,7 +46,9 @@ public class MavenProjectTest
 
         MavenProject childProject = new MavenProject( childModel );
         
-        File childFile = new File( System.getProperty( "java.io.tmpdir" ), "maven-project-tests" + System.currentTimeMillis() + "/child/pom.xml" );
+        File childFile =
+            new File( System.getProperty( "java.io.tmpdir" ), "maven-project-tests" + System.currentTimeMillis()
+                + "/child/pom.xml" );
 
         childProject.setFile( childFile );
 
@@ -94,7 +96,7 @@ public class MavenProjectTest
         File f = getFileForClasspathResource( "canonical-pom.xml" );
         MavenProject projectToClone = getProject( f );
 
-        MavenProject clonedProject = (MavenProject) projectToClone.clone();
+        MavenProject clonedProject = projectToClone.clone();
         assertEquals( "maven-core", clonedProject.getArtifactId() );
         Map<?, ?> clonedMap = clonedProject.getManagedVersionMap();
         assertNotNull( "ManagedVersionMap not copied", clonedMap );
@@ -116,7 +118,7 @@ public class MavenProjectTest
         assertNotNull( "No ManagedVersionMap", map );
         assertTrue( "ManagedVersionMap is empty", !map.isEmpty() );
 
-        MavenProject clonedProject = (MavenProject) projectToClone.clone();
+        MavenProject clonedProject = projectToClone.clone();
         assertEquals( "maven-core", clonedProject.getArtifactId() );
         Map<?, ?> clonedMap = clonedProject.getManagedVersionMap();
         assertNotNull( "ManagedVersionMap not copied", clonedMap );
@@ -144,17 +146,19 @@ public class MavenProjectTest
         assertEquals( "..", pathAdjustment );
     }
     
-    public void testCloneWithDistributionManagement() throws Exception
+    public void testCloneWithDistributionManagement()
+        throws Exception
     {
         
         File f = getFileForClasspathResource( "distributionManagement-pom.xml" );
         MavenProject projectToClone = getProject( f );
 
-        MavenProject clonedProject = (MavenProject) projectToClone.clone();
+        MavenProject clonedProject = projectToClone.clone();
         assertNotNull( "clonedProject - distributionManagement", clonedProject.getDistributionManagementArtifactRepository() );
     }
 
-    public void testCloneWithActiveProfile() throws Exception
+    public void testCloneWithActiveProfile()
+        throws Exception
     {
 
         File f = getFileForClasspathResource( "withActiveByDefaultProfile-pom.xml" );
@@ -163,13 +167,29 @@ public class MavenProjectTest
 
         assertEquals( "Expecting 1 active profile", 1, activeProfilesOrig.size() );
 
-        MavenProject clonedProject = (MavenProject) projectToClone.clone();
+        MavenProject clonedProject = projectToClone.clone();
 
         List<Profile> activeProfilesClone = clonedProject.getActiveProfiles();
 
         assertEquals( "Expecting 1 active profile", 1, activeProfilesClone.size() );
 
-        assertNotSame( "The list of active profiles should have been cloned too but is same",
-                activeProfilesOrig, activeProfilesClone);
+        assertNotSame( "The list of active profiles should have been cloned too but is same", activeProfilesOrig,
+                       activeProfilesClone );
     }
+
+    public void testUndefinedOutputDirectory()
+        throws Exception
+    {
+        MavenProject p = new MavenProject();
+        assertNoNulls( p.getCompileClasspathElements() );
+        assertNoNulls( p.getSystemClasspathElements() );
+        assertNoNulls( p.getRuntimeClasspathElements() );
+        assertNoNulls( p.getTestClasspathElements() );
+    }
+
+    private void assertNoNulls( List<String> elements )
+    {
+        assertFalse( elements.contains( null ) );
+    }
+
 }

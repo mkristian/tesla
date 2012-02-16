@@ -101,6 +101,7 @@ public class PluginDescriptorBuilderTest
         assertEquals( "finalName", mp.getName() );
         assertEquals( "jarName", mp.getAlias() );
         assertEquals( "java.lang.String", mp.getType() );
+        assertEquals( "java.lang.String", mp.getImplementation() );
         assertEquals( true, mp.isEditable() );
         assertEquals( false, mp.isRequired() );
         assertEquals( "parameter-description", mp.getDescription() );

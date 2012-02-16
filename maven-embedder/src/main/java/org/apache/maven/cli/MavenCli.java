@@ -184,6 +184,7 @@ public class MavenCli
     // TODO: need to externalize CliRequest
     public int doMain( CliRequest cliRequest )
     {
+        PlexusContainer localContainer = this.container;
         try
         {
             initialize( cliRequest );
@@ -192,7 +193,7 @@ public class MavenCli
             logging( cliRequest );
             version( cliRequest );
             properties( cliRequest );
-            container( cliRequest );
+            localContainer = container( cliRequest );
             commands( cliRequest );
             settings( cliRequest );
             populateRequest( cliRequest );
@@ -222,6 +223,10 @@ public class MavenCli
         }
         finally
         {
+            if ( localContainer != this.container )
+            {
+                localContainer.dispose();
+            }
             if ( cliRequest.fileStream != null )
             {
                 cliRequest.fileStream.close();
@@ -357,7 +362,7 @@ public class MavenCli
         populateProperties( cliRequest.commandLine, cliRequest.systemProperties, cliRequest.userProperties );
     }
 
-    private void container( CliRequest cliRequest )
+    private PlexusContainer container( CliRequest cliRequest )
         throws Exception
     {
         if ( cliRequest.classWorld == null )
@@ -430,6 +435,8 @@ public class MavenCli
         settingsBuilder = container.lookup( SettingsBuilder.class );
 
         dispatcher = (DefaultSecDispatcher) container.lookup( SecDispatcher.class, "maven" );
+
+        return container;
     }
 
     private PrintStreamLogger setupLogger( CliRequest cliRequest )
@@ -1080,6 +1087,19 @@ public class MavenCli
         }
 
         systemProperties.putAll( System.getProperties() );
+        
+        // ----------------------------------------------------------------------
+        // Properties containing info about the currently running version of Maven
+        // These override any corresponding properties set on the command line
+        // ----------------------------------------------------------------------
+
+        Properties buildProperties = CLIReportingUtils.getBuildProperties();
+
+        String mavenVersion = buildProperties.getProperty( CLIReportingUtils.BUILD_VERSION_PROPERTY );
+        systemProperties.setProperty( "maven.version", mavenVersion );
+
+        String mavenBuildVersion = CLIReportingUtils.createMavenVersionString( buildProperties );
+        systemProperties.setProperty( "maven.build.version", mavenBuildVersion );
     }
 
     private static void setCliProperty( String property, Properties properties )

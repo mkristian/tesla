@@ -31,6 +31,7 @@ import org.sonatype.aether.impl.VersionResolver;
  * should instead always use regular dependency injection to acquire the repository system.
  * 
  * @author Benjamin Bentmann
+ * @deprecated use {@link MavenServiceLocator} instead, which is more explicit.
  */
 public class DefaultServiceLocator
     extends org.sonatype.aether.impl.internal.DefaultServiceLocator
