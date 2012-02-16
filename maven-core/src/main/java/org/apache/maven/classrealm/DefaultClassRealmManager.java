@@ -205,13 +205,19 @@ public class DefaultClassRealmManager
         imports.put( "org.sonatype.inject.*", coreRealm );
         imports.put( "org.slf4j.*", coreRealm );
         
-        // com.google (JSR-330)        
-        imports.put( "com.google.inject.*", coreRealm );
-        imports.put( "com.google.inject.binder.*", coreRealm );
-        imports.put( "com.google.inject.matcher.*", coreRealm );
-        imports.put( "com.google.inject.name.*", coreRealm );
-        imports.put( "com.google.inject.spi.*", coreRealm );
-        imports.put( "com.google.inject.util.*", coreRealm );
+        // com.google
+        //
+        // We may potentially want to export these, but right now I'm not sure that anything Guice specific needs
+        // to be made available to plugin authors. If we find people are getting fancy and want to take advantage
+        // of Guice specifics we can expose that later. Really some testing needs to be done to see full hiding
+        // of Guice has any impact on what we may categorize as a standard JSR-330 based Tesla/Maven plugin.
+        //
+        // imports.put( "com.google.inject.*", coreRealm );
+        // imports.put( "com.google.inject.binder.*", coreRealm );
+        // imports.put( "com.google.inject.matcher.*", coreRealm );
+        // imports.put( "com.google.inject.name.*", coreRealm );
+        // imports.put( "com.google.inject.spi.*", coreRealm );
+        // imports.put( "com.google.inject.util.*", coreRealm );
     }
 
     /**
