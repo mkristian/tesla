@@ -62,11 +62,13 @@
       <artifactId>aether-connector-file</artifactId>
       <scope>runtime</scope>
     </dependency>
+    <!--
     <dependency>
       <groupId>org.eclipse</groupId>
       <artifactId>org.eclipse.osgi</artifactId>
       <scope>runtime</scope>
     </dependency>
+    -->
     <dependency>
       <groupId>org.sonatype.maven</groupId>
       <artifactId>wagon-ahc</artifactId>
@@ -178,6 +180,7 @@
                           <exclude>org.sonatype.gossip:gossip-slf4j</exclude>
                         </excludes>
                       </fileSet>
+                      <!--
                       <fileSet>
                         <directory>shell</directory>
                         <artifacts>
@@ -185,6 +188,7 @@
                           <artifact>org.eclipse:org.eclipse.osgi</artifact>
                         </artifacts>
                       </fileSet>
+                      -->
                       <fileSet>
                         <directory>ext</directory>
                         <artifacts>
