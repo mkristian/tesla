@@ -33,10 +33,12 @@
   </properties>
 
   <dependencies>
+    <!--
     <dependency>
       <groupId>org.eclipse.tesla.shell</groupId>
       <artifactId>maven-provision</artifactId>
     </dependency>
+    -->
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-inject-bean</artifactId>
