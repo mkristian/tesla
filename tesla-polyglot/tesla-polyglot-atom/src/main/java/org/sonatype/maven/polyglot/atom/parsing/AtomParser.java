@@ -39,11 +39,13 @@ public class AtomParser {
   }
 
   private void parseException(String message, Throwable t) {
-    throw new RuntimeException("Error parsing " + modelSource.getLocation() + ": " + message, t);
+    String location = modelSource != null ? modelSource.getLocation() : "";
+    throw new RuntimeException("Error parsing " + location + ": " + message, t);
   }
 
   private void parseException(String message) {
-    throw new RuntimeException("Error parsing " + modelSource.getLocation() + ": " + message);
+    String location = modelSource != null ? modelSource.getLocation() : "";
+    throw new RuntimeException("Error parsing " + location + ": " + message);
   }
 
   public Project parse() {
@@ -336,7 +338,7 @@ public class AtomParser {
       return null;
     }
 
-    Id pluginId = id();
+    Id pluginId = id(true);
     if (pluginId == null) {
       log.severe("Plugin id declaration malformed");
       return null;
@@ -409,9 +411,13 @@ public class AtomParser {
         match(Kind.EOL);
       } else {
         // This is a multilevel thing, recurse!
-        if (match(Kind.LBRACKET) != null) {
+        if (anyOf(Kind.LBRACKET, Kind.LBRACE) != null) {
+          chewEols();
+          chewIndents();
           Map<String, Object> childProps = configurationMap();
-          if (match(Kind.RBRACKET) == null)
+          chewEols();
+          chewIndents();
+          if (match(Kind.RBRACKET) == null && match(Kind.RBRACE) == null)
             parseException("Expected ']' after configuration properties");
 
           // stash into parent map.
@@ -468,7 +474,7 @@ public class AtomParser {
     chewIndents();
 
     String module;
-    while ((module = idFragment()).length() != 0) {
+    while ((module = idFragment()) != null) {
       chewEols();
       chewIndents();
       modules.add(module);
@@ -556,7 +562,7 @@ public class AtomParser {
       return null;
     } else {
       version = idFragment();
-      if (version == null) {
+      if (version == null && !allowNullVersion) {
         return null;
       }
     }
@@ -645,6 +651,23 @@ public class AtomParser {
       if (match(Token.Kind.DASH) != null) {
         fragment.append('-');
       }
+    }
+
+    // Try parsing as property expression.
+    if (fragment.length() == 1 && fragment.charAt(0) == '$') {
+      List<Token> startOfExpr = match(Kind.LBRACE);
+      if (startOfExpr == null)
+        return null;
+
+      fragment.append("{");
+      String prop = idFragment();
+      if (prop == null)
+        parseException("Expected a property expression after ${");
+
+      if (match(Kind.RBRACE) == null)
+        parseException("Expected '}' after property expression");
+
+      fragment.append(prop).append("}");
     }
 
     // Nothing matched.
