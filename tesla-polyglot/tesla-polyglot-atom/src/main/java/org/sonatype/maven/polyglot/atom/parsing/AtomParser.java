@@ -150,7 +150,8 @@ public class AtomParser {
     // modules
     chewEols();
     chewIndents();
-    List<Plugin> plugins = plugins();
+    List<Plugin> pluginOverrides = plugins(Kind.PLUGIN_OVERRIDE);
+    List<Plugin> plugins = plugins(Kind.PLUGIN);
 
     return new Project(projectId,
         parent,
@@ -162,6 +163,7 @@ public class AtomParser {
         overrides,
         deps,
         modules,
+        pluginOverrides,
         plugins,
         dirs,
         scm);
@@ -258,9 +260,9 @@ public class AtomParser {
     Map<String, String> dirs = new HashMap<String, String>();
     // Strip quotes and store.
     if (null != srcDir)
-      dirs.put("src", srcDir.substring(1, srcDir.length() - 1));
+      dirs.put("src", stripQuotes(srcDir));
     if (null != testDir)
-      dirs.put("test", testDir.substring(1, testDir.length() - 1));
+      dirs.put("test", stripQuotes(testDir));
 
     if (match(Token.Kind.RBRACKET) == null) {
       parseException("Expected ] after srcs list");
@@ -307,12 +309,12 @@ public class AtomParser {
   /**
    * Additional plugins and their configuration.
    */
-  private List<Plugin> plugins() {
+  private List<Plugin> plugins(Kind keyword) {
     List<Plugin> plugins = new ArrayList<Plugin>();
 
     chewEols();
     Plugin plugin;
-    while ((plugin = plugin()) != null) {
+    while ((plugin = plugin(keyword)) != null) {
       plugins.add(plugin);
 
       chewEols();
@@ -321,8 +323,8 @@ public class AtomParser {
     return plugins;
   }
 
-  private Plugin plugin() {
-    if (match(Kind.PLUGIN) == null)
+  private Plugin plugin(Kind keyword) {
+    if (match(keyword) == null)
       return null;
 
     if (match(Kind.EOL) == null) {
@@ -330,7 +332,6 @@ public class AtomParser {
     }
 
     Plugin plugin = new Plugin();
-    List<Token> propKey;
 
     chewIndents();
     if (match(Kind.ID, Kind.COLON) == null) {
@@ -355,7 +356,7 @@ public class AtomParser {
     plugin.setVersion(pluginId.getVersion());
 
     Map<String, Object> config;
-    if ((config = configurationMap()) == null)
+    if ((config = configurationMap()) == null || config.isEmpty())
       return plugin;
 
     // Transform the parsed config map into maven's XPP3 Dom thing.
@@ -402,8 +403,7 @@ public class AtomParser {
       if (atom != null) {
         atom = atom.trim();
         // Strip quotes.
-        if (atom.startsWith("\"") && atom.endsWith("\""))
-          atom = atom.substring(1, atom.length() - 1);
+        atom = stripQuotes(atom);
 
         config.put(propKey.get(0).value, atom);
 
@@ -434,6 +434,12 @@ public class AtomParser {
     }
 
     return config;
+  }
+
+  static String stripQuotes(String atom) {
+    if (atom.startsWith("\"") && atom.endsWith("\""))
+      atom = atom.substring(1, atom.length() - 1);
+    return atom;
   }
 
   private List<Property> properties(Token.Kind kind) {
@@ -522,12 +528,14 @@ public class AtomParser {
       return null;
     }
 
-    String value = idFragment();
+    List<Token> value = match(Kind.STRING);
     if (value == null) {
       return null;
     }
 
-    return new Property(key, value);
+    String actual = stripQuotes(value.get(0).value);
+
+    return new Property(key, actual);
   }
 
   /**
@@ -696,7 +704,7 @@ public class AtomParser {
 
     // Validate first URL...
     //noinspection ConstantConditions
-    String url = repositories.get(0).value; // Strip ""
+    String url = repositories.get(0).value;
     repoUrls.add(validateUrl(url));
 
     while ((repositories = match(Token.Kind.COMMA)) != null) {
@@ -716,7 +724,7 @@ public class AtomParser {
   }
 
   private String validateUrl(String url) {
-    url = url.substring(1, url.length() - 1);
+    url = stripQuotes(url);
 
     // Validate URL...
     try {
