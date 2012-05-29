@@ -75,17 +75,17 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.tesla</groupId>
+      <groupId>io.tesla</groupId>
       <artifactId>tesla-snapshot-purger</artifactId>
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.tesla</groupId>
+      <groupId>io.tesla</groupId>
       <artifactId>tesla-concurrent-localrepo</artifactId>
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.tesla</groupId>
+      <groupId>io.tesla</groupId>
       <artifactId>tesla-split-localrepo</artifactId>
       <scope>runtime</scope>
     </dependency>
@@ -198,14 +198,14 @@
                           <artifact>org.sonatype.gossip:gossip-core</artifact>
                           <artifact>org.sonatype.gossip:gossip-slf4j</artifact>
                           <artifact>org.slf4j:slf4j-api</artifact>
-                          <artifact>org.eclipse.tesla:tesla-snapshot-purger</artifact>
-                          <artifact>org.eclipse.tesla:tesla-concurrent-localrepo</artifact>
+                          <artifact>io.tesla:tesla-snapshot-purger</artifact>
+                          <artifact>io.tesla:tesla-concurrent-localrepo</artifact>
                         </artifacts>
                       </fileSet>
                       <fileSet>
                         <directory>ext/disabled</directory>
                         <artifacts>
-                          <artifact>org.eclipse.tesla:tesla-split-localrepo</artifact>
+                          <artifact>io.tesla:tesla-split-localrepo</artifact>
                         </artifacts>
                       </fileSet>
                     </fileSets>

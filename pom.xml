@@ -11,9 +11,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.eclipse.tesla</groupId>
+    <groupId>io.tesla</groupId>
     <artifactId>tesla</artifactId>
-    <version>3</version>
+    <version>4</version>
   </parent>
   
   <groupId>org.apache.maven</groupId>
@@ -21,17 +21,14 @@
   <version>3.0.4-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Apache Maven</name>
-  <description>Maven is a project development management and
-    comprehension tool. Based on the concept of a project object model:
-    builds, dependency management, documentation creation, site
-    publication, and distribution publication are all controlled from
-    the declarative file. Maven can be extended by plugins to utilise a
-    number of other development tools for reporting or the build
-    process.
+  <name>Tesla</name>
+  <description>Tesla is a project development management and
+    comprehension tool based on Apache Maven. It is a set of extensions for
+    Apache Maven that specifically help facilitate better integration with
+    m2eclipse, Nexus, Hudson, Sonar and Galaxy.
   </description>
-  <url>http://maven.apache.org/</url>
-  <inceptionYear>2001</inceptionYear>
+  <url>http://tesla.io/</url>
+  <inceptionYear>2012</inceptionYear>
 
   <properties>
     <classWorldsVersion>2.4</classWorldsVersion>
@@ -61,9 +58,9 @@
     <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
     <build.timestamp>${maven.build.timestamp}</build.timestamp>
     <!-- Identify of the distribution -->
-    <distributionId>eclipse-tesla</distributionId>
+    <distributionId>tesla-build</distributionId>
     <distributionShortName>Tesla</distributionShortName>
-    <distributionName>Eclipse Tesla</distributionName>   
+    <distributionName>Tesla</distributionName>   
   </properties>
 
   <mailingLists>
@@ -161,15 +158,6 @@
       </roles>
     </developer>
   </developers>
-
-  <!--
-  <repositories>
-    <repository>
-      <id>fusesource</id>
-      <url>http://repository.sonatype.org/content/groups/sonatype-public-grid</url>
-    </repository>
-  </repositories>
-  -->
 
   <modules>
     <module>maven-core</module>
@@ -473,17 +461,17 @@
         <version>1.4</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.tesla</groupId>
+        <groupId>io.tesla</groupId>
         <artifactId>tesla-snapshot-purger</artifactId>
         <version>1.0-SNAPSHOT</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.tesla</groupId>
+        <groupId>io.tesla</groupId>
         <artifactId>tesla-concurrent-localrepo</artifactId>
         <version>1.0-SNAPSHOT</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.tesla</groupId>
+        <groupId>io.tesla</groupId>
         <artifactId>tesla-split-localrepo</artifactId>
         <version>1.0-SNAPSHOT</version>
         <scope>runtime</scope>
