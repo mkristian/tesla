@@ -16,13 +16,6 @@
 
 package org.sonatype.maven.polyglot.atom;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -32,10 +25,20 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.sonatype.maven.polyglot.atom.parsing.Token;
 import org.sonatype.maven.polyglot.io.ModelWriterSupport;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 @Component(role = ModelWriter.class, hint = "atom")
 public class AtomModelWriter extends ModelWriterSupport {
+  private static final Pattern ATOM_REGEX = Pattern.compile("\\d+|true|false");
 
   @Requirement
   protected Logger log;
@@ -51,13 +54,13 @@ public class AtomModelWriter extends ModelWriterSupport {
     project(pw, model);
     id(pw, model);
     parent(pw, model);
-    packaging(pw, model);
     properties(pw, model);
     dependencyManagement(pw, model);
     dependencies(pw, model);
     modules(pw, model);
+    pw.println();
     pluginManagement(pw, model);
-    plugins(pw, model);
+    plugins(pw, "plugin", model);
 
     pw.flush();
     pw.close();
@@ -83,7 +86,9 @@ public class AtomModelWriter extends ModelWriterSupport {
     if (name == null) {
       name = model.getArtifactId();
     }
-    pw.println("project \"" + name + "\" @ \"" + model.getUrl() + "\"");
+    String url = model.getUrl() == null ? "" : model.getUrl();
+    pw.print("project \"" + name + "\" @ \"" + url + "\"");
+    packaging(pw, model);
   }
 
   private void id(PrintWriter pw, Model model) {
@@ -101,19 +106,17 @@ public class AtomModelWriter extends ModelWriterSupport {
 
   private void parent(PrintWriter pw, Model model) {
     if (model.getParent() != null) {
-      pw.print(indent + "inherit: " + model.getParent().getGroupId() + ":" + model.getParent().getArtifactId() + ":" + model.getParent().getVersion());
+      pw.print(indent + "inherits: " + model.getParent().getGroupId() + ":" + model.getParent().getArtifactId() + ":" + model.getParent().getVersion());
       if (model.getParent().getRelativePath() != null) {
         //pw.println(":" + model.getParent().getRelativePath());
-        pw.println(":" + "../pom.atom");        
-      } else {
-        pw.println();
+//        pw.println(":" + "../pom.atom");
       }
+      pw.println();
     }
   }
 
   private void packaging(PrintWriter pw, Model model) {
-    pw.println(indent + "packaging: " + model.getPackaging());
-    pw.println();
+    pw.println(" as " + model.getPackaging());
   }
 
   private void properties(PrintWriter pw, Model model) {
@@ -127,14 +130,13 @@ public class AtomModelWriter extends ModelWriterSupport {
         }
         Object value = model.getProperties().get(key);
         if (value != null) {
-          pw.print(key + ": " + value);
+          pw.print(key + ": " + toAtom(value.toString()));
           if (i + 1 != keys.size()) {
             pw.println();
           }
         }
       }
       pw.println(" ]");
-      pw.println();
     }
   }
 
@@ -145,7 +147,7 @@ public class AtomModelWriter extends ModelWriterSupport {
       for (int i = 0; i < modules.size(); i++) {
         String module = modules.get(i);
         if (i != 0) {
-          pw.print("             ");
+          pw.print(indent + "           ");
         }
         pw.print(module);
         if (i + 1 != modules.size()) {
@@ -153,7 +155,6 @@ public class AtomModelWriter extends ModelWriterSupport {
         }
       }
       pw.println(" ]");
-      pw.println();
     }
   }
 
@@ -182,69 +183,101 @@ public class AtomModelWriter extends ModelWriterSupport {
           // We are assuming the model is well-formed and that the parent is providing a version
           // for this particular dependency.
           //
-          pw.print(d.getGroupId() + ":" + d.getArtifactId());          
+          pw.print(d.getGroupId() + ":" + d.getArtifactId());
         }
         if (d.getClassifier() != null) {
           pw.print("(" + d.getClassifier() + ")");
-        }        
+        }
         if (i + 1 != deps.size()) {
           pw.println();
         }
       }
       pw.println(" ]");
-      pw.println();
     }
   }
 
   private void pluginManagement(PrintWriter pw, Model model) {
     if (model.getBuild() != null && model.getBuild().getPluginManagement() != null) {
-      plugins(pw, "pluginOverrides", model.getBuild().getPluginManagement().getPlugins());
+      plugins(pw, Token.PLUGIN_OVERRIDE_KEYWORD, model.getBuild().getPluginManagement().getPlugins());
     }
   }
 
-  private void plugins(PrintWriter pw, Model model) {
+  private void plugins(PrintWriter pw, String element, Model model) {
     if (model.getBuild() != null && !model.getBuild().getPlugins().isEmpty()) {
-      plugins(pw, "plugins", model.getBuild().getPlugins());
+      plugins(pw, element, model.getBuild().getPlugins());
     }
   }
 
   // need to write nested objects
-  private void plugins(PrintWriter pw, String elementName, List<Plugin> plugins) {
+  private void plugins(PrintWriter pw, String element, List<Plugin> plugins) {
     if (!plugins.isEmpty()) {
-      pw.print(indent + elementName + ": [ ");
       for (int i = 0; i < plugins.size(); i++) {
         Plugin plugin = plugins.get(i);
-        if (i != 0) {
-          pw.print("             ");
-        }
-        pw.print(plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion());
+        pw.println("\n" + element);
+
+        pw.print(indent + "id: " + plugin.getGroupId() + ":" + plugin.getArtifactId());
+        if (plugin.getVersion() != null)
+          pw.print(":" + plugin.getVersion());
         if (plugin.getConfiguration() != null) {
           pw.println();
           Xpp3Dom configuration = (Xpp3Dom) plugin.getConfiguration();
-          if (configuration.getChildCount() != 0) {
-            pw.print("               properties:[ ");
-            int count = configuration.getChildCount();
-            for (int j = 0; j < count; j++) {
-              Xpp3Dom c = configuration.getChild(j);
-              if (c.getValue() != null) {
-                if (j != 0) {
-                  pw.print("                            ");
-                }
-                pw.print(c.getName() + ": " + c.getValue());
-                if (j + 1 != count) {
-                  pw.println();
-                }
-              }
-            }
-            pw.print(" ]");
-          }
+          printChildren(pw, configuration);
         }
         if (i + 1 != plugins.size()) {
           pw.println();
         }
       }
-      pw.println(" ]");
       pw.println();
     }
+  }
+
+  private boolean flipBrackets = false;
+
+  private void printChildren(PrintWriter pw, Xpp3Dom configuration) {
+    if (configuration.getChildCount() > 0) {
+      int count = configuration.getChildCount();
+      for (int j = 0; j < count; j++) {
+        Xpp3Dom c = configuration.getChild(j);
+        if (c.getValue() != null) {
+          pw.print(indent + c.getName() + ": " + toAtom(c.getValue()));
+          if (j + 1 != count) {
+            pw.println();
+          }
+        } else {
+
+          String keyString = indent + c.getName() + ": " + lbraceket();
+
+          if (c.getChildCount() == 0)
+            pw.print(keyString);
+          else
+            pw.println(keyString);
+          String oldIndent = indent;
+          indent += "  ";
+          flipBrackets = !flipBrackets;
+          printChildren(pw, c);
+          flipBrackets = !flipBrackets;
+          indent = oldIndent;
+          if (c.getChildCount() == 0)
+            pw.print(rbraceket());
+          else
+            pw.print("\n" + indent + rbraceket());
+        }
+      }
+    }
+  }
+
+  /**
+   * Quotes the dom element as a string, but only if necessary.
+   */
+  private String toAtom(String value) {
+    return '"' + value + '"';
+  }
+
+  private char lbraceket() {
+    return (flipBrackets ? '{' : '[');
+  }
+
+  private char rbraceket() {
+    return (flipBrackets ? '}' : ']');
   }
 }

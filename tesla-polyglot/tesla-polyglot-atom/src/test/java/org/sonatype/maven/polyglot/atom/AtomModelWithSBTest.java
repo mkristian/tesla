@@ -1,14 +1,5 @@
 package org.sonatype.maven.polyglot.atom;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.HashMap;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
@@ -18,6 +9,14 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.guice.bean.containers.InjectedTestCase;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.HashMap;
 
 public class AtomModelWithSBTest extends InjectedTestCase {
 
@@ -52,18 +51,21 @@ public class AtomModelWithSBTest extends InjectedTestCase {
     //
     assertNotNull(atomModel);
     testMavenModelForCompleteness(atomModel);
-     
+
     w = new StringWriter();
     MavenXpp3Writer xmlWriter = new MavenXpp3Writer();
     xmlWriter.write(w, xmlModel);
     System.out.println(w.toString());
+
+    assertEquals(xmlModel.getModules(), atomModel.getModules());
+    assertEquals(xmlModel.getRepositories().size(), atomModel.getRepositories().size());
   }
 
   public void testAtomModelWriterWhereModelHasDependenciesWithNoVersions() throws Exception {
     File pom = new File(poms, "sitebricks-pom.xml");
     MavenXpp3Reader xmlModelReader = new MavenXpp3Reader();
     Model xmlModel = xmlModelReader.read(new FileInputStream(pom));
-    
+
     //
     // Write out the Atom POM
     //
@@ -83,11 +85,9 @@ public class AtomModelWithSBTest extends InjectedTestCase {
     //
     // Test for fidelity
     //
-    //assertNotNull(atomModel);
-
-    
+    assertNotNull(atomModel);
   }
-  
+
   void testMavenModelForCompleteness(Model model) {
     //
     // repos
@@ -100,11 +100,11 @@ public class AtomModelWithSBTest extends InjectedTestCase {
     //
     // id
     //
-    assertEquals("org.sonatype.oss:oss-parent:6", model.getParent().getGroupId() + ":" + model.getParent().getArtifactId() + ":" + model.getParent().getVersion());
+//    assertEquals("org.sonatype.oss:oss-parent:6", model.getParent().getGroupId() + ":" + model.getParent().getArtifactId() + ":" + model.getParent().getVersion());
     //
     // properties
     //
-    assertEquals("pom", model.getPackaging());
+//    assertEquals("pom", model.getPackaging());
     assertEquals("5.8", model.getProperties().getProperty("org.testng.version"));
     assertEquals("6.1.9", model.getProperties().getProperty("org.mortbay.jetty.version"));
     //
@@ -139,5 +139,4 @@ public class AtomModelWithSBTest extends InjectedTestCase {
   String gav(Plugin p) {
     return p.getGroupId() + ":" + p.getArtifactId() + ":" + p.getVersion();
   }
-
 }

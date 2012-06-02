@@ -68,7 +68,7 @@ import java.util.Properties;
 
 /**
  * {@link MavenSystem} implementation.
- * 
+ *
  * @author <a href="mailto:jason@planet57.com">Jason Dillon</a>
  * @since 0.9
  */
@@ -206,9 +206,9 @@ public class MavenSystemImpl implements MavenSystem {
     //TODO - move the container creation in the GuiceMain
     //TODO - figure out how to share the container if i need it or inject something else
     //TODO - i can create another contruct as after i boot the container i can do plain injection
-    
+
     private DefaultPlexusContainer createContainer() throws Exception {
-      
+
       ContainerConfiguration cc = new DefaultContainerConfiguration()
         .setClassWorld(config.getClassWorld())
         .setAutoWiring(true)
@@ -559,6 +559,9 @@ public class MavenSystemImpl implements MavenSystem {
       log.debug("Removing all realms from: {}", world);
 
       // noinspection unchecked
+      purgeStrayShutdownHooks(world.getRealms());
+
+      // noinspection unchecked
       for (ClassRealm realm : (List<ClassRealm>) world.getRealms()) {
         String id = realm.getId();
         try {
@@ -568,9 +571,6 @@ public class MavenSystemImpl implements MavenSystem {
           log.warn("Failed to dispose class realm: {}", id, e);
         }
       }
-
-      // noinspection unchecked
-      purgeStrayShutdownHooks(world.getRealms());
 
       container.dispose();
     }

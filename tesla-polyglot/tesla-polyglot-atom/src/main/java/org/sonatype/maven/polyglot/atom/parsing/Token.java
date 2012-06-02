@@ -9,6 +9,7 @@ import java.util.Map;
  * @author dhanji@gmail.com (Dhanji R. Prasanna)
  */
 public class Token {
+  public static final String PLUGIN_OVERRIDE_KEYWORD = "plugin-override";
   public final String value;
   public final Kind kind;
 
@@ -19,10 +20,7 @@ public class Token {
 
   public static enum Kind {
     IDENT,
-    TYPE_IDENT,
-    INTEGER,
     STRING,
-    REGEX,
     DOT,
 
     COLON,
@@ -38,7 +36,6 @@ public class Token {
     HASHROCKET,
 
     // Comparison operators
-    EQUALS,
     LEFT_WAVE,
     GREATER,
     LEQ,
@@ -46,10 +43,10 @@ public class Token {
 
     LPAREN,
     RPAREN,
-    LBRACE,
-    RBRACE,
     LBRACKET,
     RBRACKET,
+    LBRACE,
+    RBRACE,
 
     // keywords
     REQUIRE,
@@ -61,28 +58,20 @@ public class Token {
     OR,
     AND,
     NOT,
-    FOR,
-    IN,
-    IF,
     DEPS,
     ID,
     PARENT,
-    UNLESS,
-    WHERE,
-
-    WHEN,
 
     // specials
     EOL,
-    INDENT, 
-    DASH, 
-    PACKAGING, 
-    OVERRIDES, 
+    INDENT,
+    DASH,
+    PACKAGING,
+    OVERRIDES,
     PROPS,
-    MODULES, 
-    PLUGINS;
-    //DOLLAR, 
-    //PROJECT_DOT_VERSION;
+    MODULES,
+    PLUGIN,
+    PLUGIN_OVERRIDE;
 
     private static final Map<String, Kind> TOKEN_MAP = new HashMap<String, Kind>();
 
@@ -104,35 +93,30 @@ public class Token {
 
       TOKEN_MAP.put("(", LPAREN);
       TOKEN_MAP.put(")", RPAREN);
-      //TOKEN_MAP.put("$", DOLLAR);      
-      //TOKEN_MAP.put("{", LBRACE);
-      //TOKEN_MAP.put("}", RBRACE);
       TOKEN_MAP.put("[", LBRACKET);
       TOKEN_MAP.put("]", RBRACKET);
+      TOKEN_MAP.put("{", LBRACE);   // Alias braces as brackets.
+      TOKEN_MAP.put("}", RBRACE);
       TOKEN_MAP.put("\n", EOL);
 
       TOKEN_MAP.put("id", ID);
-      TOKEN_MAP.put("inherit", PARENT);
-      TOKEN_MAP.put("packaging", PACKAGING);
+      TOKEN_MAP.put("inherits", PARENT);
+      TOKEN_MAP.put("as", PACKAGING);
       TOKEN_MAP.put("properties", PROPS);
       TOKEN_MAP.put("deps", DEPS);
       TOKEN_MAP.put("overrides", OVERRIDES);
       TOKEN_MAP.put("repositories", REPOSITORIES);
       TOKEN_MAP.put("project", PROJECT);
       TOKEN_MAP.put("srcs", SRCS);
-      TOKEN_MAP.put("scm", SCM);      
-      TOKEN_MAP.put("modules", MODULES);      
-      TOKEN_MAP.put("plugins", PLUGINS );      
-
-      TOKEN_MAP.put("require", REQUIRE);
+      TOKEN_MAP.put("scm", SCM);
+      TOKEN_MAP.put("modules", MODULES);
+      TOKEN_MAP.put("plugin", PLUGIN);
+      TOKEN_MAP.put(PLUGIN_OVERRIDE_KEYWORD, PLUGIN_OVERRIDE);
 
 
       TOKEN_MAP.put("||", OR);
-      TOKEN_MAP.put("or", OR);
       TOKEN_MAP.put("&&", AND);
-      TOKEN_MAP.put("and", AND);
       TOKEN_MAP.put("!", NOT);
-      TOKEN_MAP.put("not", NOT);
     }
 
     /**

@@ -11,9 +11,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.eclipse.tesla</groupId>
+    <groupId>io.tesla</groupId>
     <artifactId>tesla</artifactId>
-    <version>3</version>
+    <version>4</version>
   </parent>
   
   <groupId>org.apache.maven</groupId>
@@ -21,17 +21,14 @@
   <version>3.0.4-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Apache Maven</name>
-  <description>Maven is a project development management and
-    comprehension tool. Based on the concept of a project object model:
-    builds, dependency management, documentation creation, site
-    publication, and distribution publication are all controlled from
-    the declarative file. Maven can be extended by plugins to utilise a
-    number of other development tools for reporting or the build
-    process.
+  <name>Tesla</name>
+  <description>Tesla is a project development management and
+    comprehension tool based on Apache Maven. It is a set of extensions for
+    Apache Maven that specifically help facilitate better integration with
+    m2eclipse, Nexus, Hudson, Sonar and Galaxy.
   </description>
-  <url>http://maven.apache.org/</url>
-  <inceptionYear>2001</inceptionYear>
+  <url>http://tesla.io/</url>
+  <inceptionYear>2012</inceptionYear>
 
   <properties>
     <classWorldsVersion>2.4</classWorldsVersion>
@@ -41,7 +38,7 @@
     <plexusVersion>1.5.5</plexusVersion>
     <plexusInterpolationVersion>1.14</plexusInterpolationVersion>
     <plexusUtilsVersion>2.0.6</plexusUtilsVersion>
-    <sisuInjectVersion>2.3.0</sisuInjectVersion>
+    <sisuInjectVersion>2.3.1-SNAPSHOT</sisuInjectVersion>
     <wagonVersion>1.0</wagonVersion>
     <securityDispatcherVersion>1.3</securityDispatcherVersion>
     <cipherVersion>1.7</cipherVersion>
@@ -54,15 +51,17 @@
     <gossipVersion>1.7</gossipVersion>
     <jlineVersion>2.3</jlineVersion>
     <buildAvoidanceVersion>1.0-SNAPSHOT</buildAvoidanceVersion>
+    <equinoxVersion>3.7.0.v20110524</equinoxVersion>
+    <provisoVersion>0.0.6</provisoVersion>
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
     <build.timestamp>${maven.build.timestamp}</build.timestamp>
     <!-- Identify of the distribution -->
-    <distributionId>eclipse-tesla</distributionId>
+    <distributionId>tesla-build</distributionId>
     <distributionShortName>Tesla</distributionShortName>
-    <distributionName>Eclipse Tesla</distributionName>   
+    <distributionName>Tesla</distributionName>   
   </properties>
 
   <mailingLists>
@@ -161,15 +160,6 @@
     </developer>
   </developers>
 
-  <!--
-  <repositories>
-    <repository>
-      <id>fusesource</id>
-      <url>http://repository.sonatype.org/content/groups/sonatype-public-grid</url>
-    </repository>
-  </repositories>
-  -->
-
   <modules>
     <module>maven-core</module>
     <module>apache-maven</module>
@@ -184,6 +174,9 @@
     <module>maven-embedder</module>
     <module>maven-compat</module>
     <module>tesla-shell</module>
+    <!-- Separate this into a branch
+    <module>tesla-shell-osgi</module>    
+    -->
     <module>tesla-polyglot</module> 
   </modules>
 
@@ -469,22 +462,32 @@
         <version>1.4</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.tesla</groupId>
+        <groupId>io.tesla</groupId>
         <artifactId>tesla-snapshot-purger</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>0.0.1-SNAPSHOT</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.tesla</groupId>
+        <groupId>io.tesla</groupId>
         <artifactId>tesla-concurrent-localrepo</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>0.0.1-SNAPSHOT</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.tesla</groupId>
+        <groupId>io.tesla</groupId>
         <artifactId>tesla-split-localrepo</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>0.0.1-SNAPSHOT</version>
         <scope>runtime</scope>
       </dependency>
       <!--bootstrap-start-comment-->
+      <dependency>
+        <groupId>org.eclipse.tesla.shell</groupId>
+        <artifactId>tesla-shell-osgi-core</artifactId>
+        <version>${gshellVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.tesla.shell</groupId>
+        <artifactId>maven-provision</artifactId>
+        <version>${gshellVersion}</version>
+      </dependency>
       <dependency>
         <groupId>org.eclipse.tesla.shell</groupId>
         <artifactId>tesla-shell-core</artifactId>
@@ -607,6 +610,11 @@
         <groupId>org.eclipse.tesla</groupId>
         <artifactId>maven-build-context</artifactId>
         <version>${buildAvoidanceVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse</groupId>
+        <artifactId>org.eclipse.osgi</artifactId>
+        <version>${equinoxVersion}</version>
       </dependency>
       <!--bootstrap-start-comment-->
       <dependency>
@@ -913,28 +921,4 @@
     </profile>
   </profiles>
 
-  <repositories>
-    <repository>
-        <id>rso</id>
-        <url>https://repository.sonatype.org/content/repositories/snapshots/</url>
-        <snapshots>
-          <enabled>true</enabled>
-        </snapshots>        
-     </repository>
-    <repository>
-        <id>tesla</id>
-        <url>http://us3.maven.org:8081/nexus/content/repositories/releases/</url>
-     </repository>
-    <repository>
-        <id>tesla-snapshots</id>
-        <url>http://us3.maven.org:8081/nexus/content/repositories/snapshots/</url>
-        <snapshots>
-          <enabled>true</enabled>
-        </snapshots>        
-     </repository>
-        <repository>
-          <id>tesla-old</id>
-          <url>http://jvz.io:8081/nexus/content/repositories/releases/</url>
-        </repository>
-  </repositories>
 </project>

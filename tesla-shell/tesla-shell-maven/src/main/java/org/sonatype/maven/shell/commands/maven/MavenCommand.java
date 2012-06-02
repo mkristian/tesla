@@ -30,6 +30,7 @@ import org.sonatype.gshell.util.cli2.Option;
 import org.sonatype.gshell.util.pref.Preference;
 import org.sonatype.gshell.util.pref.Preferences;
 import org.sonatype.gshell.variables.Variables;
+import org.sonatype.inject.Nullable;
 import org.sonatype.maven.shell.maven.MavenRuntime;
 import org.sonatype.maven.shell.maven.MavenRuntimeConfiguration;
 import org.sonatype.maven.shell.maven.MavenSystem;
@@ -50,12 +51,16 @@ import static org.apache.maven.execution.MavenExecutionRequest.REACTOR_MAKE_UPST
 import static org.sonatype.gshell.variables.VariableNames.SHELL_HOME;
 import static org.sonatype.gshell.variables.VariableNames.SHELL_USER_DIR;
 
+import javax.inject.Named;
+
 /**
  * Execute Maven.
  * 
  * @author <a href="mailto:jason@planet57.com">Jason Dillon</a>
+ * @author <a href="mailto:adreghiciu@gmail.com">Alin Dreghiciu</a>
  * @since 0.7
  */
+@Named
 @Command(name = "mvn")
 @Preferences(path = "commands/mvn")
 public class MavenCommand extends CommandActionSupport implements CliProcessorAware {
@@ -67,7 +72,9 @@ public class MavenCommand extends CommandActionSupport implements CliProcessorAw
 
   private Properties props;
 
-  @Option(name = "D", longName = "define")
+  private final MavenRuntimeConfiguration.Customizer customizer;
+
+    @Option(name = "D", longName = "define")
   protected void setProperty(final String input) {
     assert input != null;
 
@@ -235,9 +242,12 @@ public class MavenCommand extends CommandActionSupport implements CliProcessorAw
   private boolean growl = true;
 
   @Inject
-  public MavenCommand(final MavenSystem maven) {
+  public MavenCommand(final MavenSystem maven,
+                      @Nullable MavenRuntimeConfiguration.Customizer customizer )
+  {
     assert maven != null;
     this.maven = maven;
+    this.customizer = customizer;
   }
 
   // HACK: Setup growl once, so clones get the same instance, no real init or registered hook in gshell yet, so we have to use this
@@ -303,6 +313,9 @@ public class MavenCommand extends CommandActionSupport implements CliProcessorAw
     }
     if (logFile != null) {
       config.setLogFile(logFile);
+    }
+    if ( customizer != null) {
+      customizer.customize( config );
     }
 
     customize(config);

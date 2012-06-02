@@ -170,4 +170,16 @@ public class MavenRuntimeConfiguration {
   public static interface Delegate {
     void configure(DefaultPlexusContainer container) throws Exception;
   }
+
+  /**
+   * @author <a href="mailto:adreghiciu@gmail.com">Alin Dreghiciu</a>
+   * @since 3.0.4
+   */
+  public static interface Customizer
+  {
+
+      void customize( MavenRuntimeConfiguration configuration ) throws Exception;
+
+  }
+
 }

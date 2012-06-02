@@ -33,10 +33,61 @@
   </properties>
 
   <dependencies>
+    <!--
+    <dependency>
+      <groupId>org.eclipse.tesla.shell</groupId>
+      <artifactId>maven-provision</artifactId>
+    </dependency>
+    -->
+    <dependency>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-inject-bean</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-core</artifactId>
       <scope>test</scope>
+    </dependency>
+
+    <!--
+    FIXME: The following dependencies are here just to avoid Proviso resolving error.
+    They should be dropped when Proviso is fixed.
+    -->
+    <dependency>
+      <groupId>org.sonatype.aether</groupId>
+      <artifactId>aether-connector-file</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <!--
+    <dependency>
+      <groupId>org.eclipse</groupId>
+      <artifactId>org.eclipse.osgi</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    -->
+    <dependency>
+      <groupId>org.sonatype.maven</groupId>
+      <artifactId>wagon-ahc</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.tesla</groupId>
+      <artifactId>tesla-snapshot-purger</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.tesla</groupId>
+      <artifactId>tesla-concurrent-localrepo</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.tesla</groupId>
+      <artifactId>tesla-split-localrepo</artifactId>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
   
@@ -78,7 +129,7 @@
       <plugin>
         <groupId>org.eclipse.tesla.plugins</groupId>
         <artifactId>tesla-proviso-plugin</artifactId>
-        <version>0.0.5-SNAPSHOT</version>
+        <version>${provisoVersion}</version>
         <extensions>true</extensions>
         <executions>
           <execution>
@@ -129,6 +180,15 @@
                           <exclude>org.sonatype.gossip:gossip-slf4j</exclude>
                         </excludes>
                       </fileSet>
+                      <!--
+                      <fileSet>
+                        <directory>shell</directory>
+                        <artifacts>
+                          <artifact>org.eclipse.tesla.shell:tesla-shell-osgi-core</artifact>
+                          <artifact>org.eclipse:org.eclipse.osgi</artifact>
+                        </artifacts>
+                      </fileSet>
+                      -->
                       <fileSet>
                         <directory>ext</directory>
                         <artifacts>
@@ -138,14 +198,14 @@
                           <artifact>org.sonatype.gossip:gossip-core</artifact>
                           <artifact>org.sonatype.gossip:gossip-slf4j</artifact>
                           <artifact>org.slf4j:slf4j-api</artifact>
-                          <artifact>org.eclipse.tesla:tesla-snapshot-purger</artifact>
-                          <artifact>org.eclipse.tesla:tesla-concurrent-localrepo</artifact>
+                          <artifact>io.tesla:tesla-snapshot-purger</artifact>
+                          <artifact>io.tesla:tesla-concurrent-localrepo</artifact>
                         </artifacts>
                       </fileSet>
                       <fileSet>
                         <directory>ext/disabled</directory>
                         <artifacts>
-                          <artifact>org.eclipse.tesla:tesla-split-localrepo</artifact>
+                          <artifact>io.tesla:tesla-split-localrepo</artifact>
                         </artifacts>
                       </fileSet>
                     </fileSets>
