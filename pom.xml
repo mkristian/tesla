@@ -172,11 +172,6 @@
     <module>maven-model-builder</module>
     <module>maven-embedder</module>
     <module>maven-compat</module>
-    <module>tesla-shell</module>
-    <!-- Separate this into a branch
-    <module>tesla-shell-osgi</module>    
-    -->
-    <module>tesla-polyglot</module> 
   </modules>
 
   <scm>
