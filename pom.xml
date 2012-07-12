@@ -956,4 +956,24 @@
           <url>http://jvz.io:8081/nexus/content/repositories/releases/</url>
         </repository>
   </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+        <id>tesla</id>
+        <url>http://us3.maven.org:8081/nexus/content/repositories/releases/</url>
+     </pluginRepository>
+    <pluginRepository>
+        <id>tesla-snapshots</id>
+        <url>http://us3.maven.org:8081/nexus/content/repositories/snapshots/</url>
+        <snapshots>
+          <enabled>true</enabled>
+        </snapshots>        
+        </pluginRepository>
+    <pluginRepository>
+        <id>rso</id>
+        <url>https://repository.sonatype.org/content/repositories/snapshots/</url>
+        <snapshots>
+          <enabled>true</enabled>
+        </snapshots>  
+	</pluginRepository>
+  </pluginRepositories>
 </project>
